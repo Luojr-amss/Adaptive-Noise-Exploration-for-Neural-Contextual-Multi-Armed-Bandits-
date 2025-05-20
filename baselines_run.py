@@ -1,9 +1,5 @@
-from KernelUCB import KernelUCB
-from LinUCB import Linearucb
-from Neural_epsilon import Neural_epsilon
-from NeuralTS import NeuralTS
-from EAP import NeuralUCBDiag
-from NeuralNoExplore import NeuralNoExplore
+
+from EAP import EAP
 import argparse
 import numpy as np
 import sys
@@ -16,7 +12,7 @@ if __name__ == '__main__':
     parser.add_argument('--dataset', default='movielens', type=str, help='mnist, yelp, movielens, disin')
 
     parser.add_argument("--method", nargs="+", default=["NeuralUCB"],
-                        help='list: ["KernelUCB", "LinUCB", "Neural_epsilon", "NeuralTS", "NeuralUCB", "NeuralNoExplore"]')
+                        help='')
 
     parser.add_argument('--lamdba', default='0.1', type=float, help='Regulization Parameter')
     parser.add_argument('--nu', default='0.001', type=float, help='Exploration Parameter')
@@ -42,26 +38,12 @@ if __name__ == '__main__':
 
             print("Number of arms:", num_arms)
 
-            if method == "KernelUCB":
-                model = KernelUCB(b.dim, arg_lambda, arg_nu)
-
-            elif method == "LinUCB":
-                model = Linearucb(b.dim, arg_lambda, arg_nu)
-
-            elif method == "Neural_epsilon":
-                epsilon = 0.01
-                model = Neural_epsilon(b.dim, epsilon)
-
-            elif method == "NeuralTS":
-                model = NeuralTS(b.dim, b.n_arm, m=100, sigma=arg_lambda, nu=arg_nu)
-
-            elif method == "NeuralUCB":
-                model = NeuralUCBDiag(b.dim, lamdba=arg_lambda, nu=arg_nu, hidden=100)
+            if method == "NeuralUCB":
+                model = EAP(b.dim, lamdba=arg_lambda, nu=arg_nu, hidden=100)
 
 
 
-            elif method == "NeuralNoExplore":
-                model = NeuralNoExplore(b.dim)
+
             else:
                 print("method is not defined. --help")
                 sys.exit()
@@ -83,13 +65,8 @@ if __name__ == '__main__':
 
 
 
-                if method == "LinUCB" or method == "KernelUCB":
-                    model.train(context[arm_select], reward)
-
-                elif method == "Neural_epsilon" or method == "NeuralUCB" or method == "NeuralTS" or method == "NeuralNoExplore":
-                    #model.update(context[arm_select], reward)
-
-                    model.update(context[arm_select], reward, arm_select)  # neural_1更新模型
+                if method == "NeuralUCB" :
+                    model.update(context[arm_select], reward, arm_select)
 
 
 
